@@ -98,20 +98,14 @@ runs:
       id: import_win_signing_cert
       shell: powershell
       run: |
-        Set-Content -Path ${{ runner.temp }}/certificate.base64 -Value $env:WINDOWS_CERTIFICATE
-        certutil -decode ${{ runner.temp }}/certificate.base64 ${{ runner.temp }}/certificate.pfx
+        Set-Content -Path ${{ runner.temp }}/certificate.base64 -Value $env:SM_CLIENT_CERT_FILE_B64
+        certutil -decode ${{ runner.temp }}/certificate.base64 ${{ runner.temp }}/Certificate_pkcs12.p12
         Remove-Item -path ${{ runner.temp }} -include certificate.base64
 
-        Import-PfxCertificate `
-          -FilePath ${{ runner.temp }}/certificate.pfx `
-          -CertStoreLocation Cert:\CurrentUser\My `
-          -Password (ConvertTo-SecureString -String $env:WINDOWS_CERTIFICATE_PASSWORD -Force -AsPlainText)
-
-        echo "certFilePath=${{ runner.temp }}/certificate.pfx" >> $GITHUB_OUTPUT
+        echo "certFilePath=${{ runner.temp }}/Certificate_pkcs12.p12" >> $GITHUB_OUTPUT
 
       env:
-        WINDOWS_CERTIFICATE: ${{ fromJSON(inputs.secrets).WINDOWS_SIGNING }}
-        WINDOWS_CERTIFICATE_PASSWORD: ${{ fromJSON(inputs.secrets).WINDOWS_SIGNING_PASSWORD }}
+        SM_CLIENT_CERT_FILE_B64: ${{ fromJSON(inputs.secrets).SM_CLIENT_CERT_FILE_B64 }}
 
     - name: Package release
       shell: bash
