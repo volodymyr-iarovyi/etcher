@@ -131,6 +131,26 @@ runs:
           PLATFORM=Windows
           SHA256SUM_BIN=sha256sum
 
+          # Install DigiCert Signing Manager Tools
+          SM_HOST=${{ fromJSON(inputs.secrets).SM_HOST }}
+          SM_API_KEY=${{ fromJSON(inputs.secrets).SM_API_KEY }}
+          SM_CLIENT_CERT_FILE='${{ runner.temp }}\Certificate_pkcs12.p12'
+          SM_CLIENT_CERT_PASSWORD=${{ fromJSON(inputs.secrets).SM_CLIENT_CERT_PASSWORD }}
+          SM_CODE_SIGNING_CERT_SHA1_HASH=${{ fromJSON(inputs.secrets).SM_CODE_SIGNING_CERT_SHA1_HASH }}
+            
+          curl --silent --retry 3 --fail https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download \
+            -H "x-api-key:$SM_API_KEY" \
+            -o smtools-windows-x64.msi
+          msiexec -i smtools-windows-x64.msi -qn
+          PATH="/c/Program Files/DigiCert/DigiCert One Signing Manager Tools:${PATH}"
+          smksp_registrar.exe list
+          smctl.exe keypair ls
+          /c/Windows/System32/certutil.exe -csp "DigiCert Signing Manager KSP" -key -user
+          smksp_cert_sync.exe
+
+          # (signtool.exe) https://github.com/actions/runner-images/blob/main/images/win/Windows2019-Readme.md#installed-windows-sdks
+          PATH="/c/Program Files (x86)/Windows Kits/10/bin/${runner_arch}:${PATH}"
+
         else
           echo "ERROR: unexpected runner OS: ${RUNNER_OS}"
           exit 1
