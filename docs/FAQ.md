@@ -1,6 +1,7 @@
 ## Why is my drive not bootable?
 
 Etcher copies images to drives byte by byte, without doing any transformation to the final device, which means images that require special treatment to be made bootable, like Windows images, will not work out of the box. In these cases, the general advice is to use software specific to those kind of images, usually available from the image publishers themselves. You can find more information [here](https://github.com/balena-io/etcher/blob/master/docs/USER-DOCUMENTATION.md#why-is-my-drive-not-bootable).
+<a href="https://efp.balena.io/open-image-url?imageUrl=<your image URL>"><img src="http://balena.io/flash-with-etcher.png" /></a>
 
 ## How can I configure persistent storage?
 
